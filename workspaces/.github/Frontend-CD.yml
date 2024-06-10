@@ -1,0 +1,66 @@
+name: Frontend-CD Workflow kubernetes
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'workspaces/starter/frontend/**'
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Login to container registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ secrets.DOCKER_REGISTRY_URL }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+
+    - name: Build and Docker image
+      run: |
+        IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)
+        docker buildx build \
+          --platform linux/amd64,linux/arm64 \
+          --push \
+          --tag ${{ secrets.DOCKER_REGISTRY_URL }}/${{ secrets.image-FE-name }}:$IMAGE_TAG \
+      - name: Run tests
+        run: npm run test
+
+      - name: Run build
+        run: npm run build
+      - name: Tag Docker image with Git SHA
+        run: |
+          IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)
+          docker tag ${{ secrets.DOCKER_REGISTRY_URL }}/${{ secrets.image-FE-name }}:$IMAGE_TAG \
+            ${{ secrets.DOCKER_REGISTRY_URL }}/${{ secrets.image-FE-name }}:$IMAGE_TAG
+      - name: Push Docker image with Git SHA tag to ECR
+        run: |
+          IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)
+          docker push ${{ secrets.DOCKER_REGISTRY_URL }}/${{ secrets.image-FE-name }}:$IMAGE_TAG
+
+      # - name: Apply Kubernetes manifests
+      #   run: |
+      #     echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+      #     IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)
+      #     sed -i "s|image-FE-name:latest|${{ secrets.DOCKER_REGISTRY_URL }}/${{ secrets.image-FE-name }}:$IMAGE_TAG|g" deployment.yaml
+      #     kubectl apply -f deployment.yaml      
+    # - name: Set up kubectl
+    #   uses: azure/setup-kubectl@v2
+    #   with:
+    #     version: 'latest'
+
+    - name: Deploy to Kubernetes
+      run: |
+        IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)
+        sed -i "s|image-FE-name:latest|${{ secrets.DOCKER_REGISTRY_URL }}/${{ secrets.image-FE-name }}:$IMAGE_TAG|g" workspace/starter/frontend/k8s/deployment.yaml
+        echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+        kubectl apply -f workspace/starter/frontend/k8s/deployment.yml --kubeconfig=kubeconfig.yaml
+        kubectl apply -f workspace/starter/frontend/k8s/service.yml --kubeconfig=kubeconfig.yaml
