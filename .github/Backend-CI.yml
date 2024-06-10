@@ -1,0 +1,68 @@
+name: Backend-CI Workflow
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'workspaces/starter/backend/**'
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10-alpine'
+      - name: Install package
+        run: apk update && apk add pcre pcre-dev build-base gcc linux-headers openss libffi-dev && pip install pipenv
+
+      - name: Install dependencies
+        run: pip install pipenv && pipenv install --dev
+
+      - name: Run linting
+        run: pipenv run flake8 backend
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10-alpine'
+      - name: Install package
+        run: apk update && apk add pcre pcre-dev build-base gcc linux-headers openss libffi-dev && pip install pipenv
+
+      - name: Install dependencies
+        run: pip install pipenv && pipenv install --dev
+
+      - name: Run tests
+        run: pipenv run pytest backend/test_app.py
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10-alpine'
+
+      - name: Install dependencies
+        run: pip install pipenv && pipenv install --dev
+
+      # Your build steps here, replace 'python backend/build.py' with your actual build command
+      # - name: Run build
+      #   run: pipenv run python backend/build.py
