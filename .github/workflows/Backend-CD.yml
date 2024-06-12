@@ -79,7 +79,7 @@ jobs:
       working-directory: workspaces/starter/backend
       env:
         IMAGE_TAG: latest
-        REPO_NAME: backend
+        REPO_NAME: movie
       run: |
         docker build --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 --tag 851725438281.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG .
         docker push 851725438281.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
@@ -91,7 +91,7 @@ jobs:
       working-directory: workspaces/starter/backend/k8s
       env:
         IMAGE_TAG: latest
-        REPO_NAME: backend
+        REPO_NAME: movie
       run: |
         aws eks update-kubeconfig --name my-cluster --region us-east-1
         kustomize edit set image backend=851725438281.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG

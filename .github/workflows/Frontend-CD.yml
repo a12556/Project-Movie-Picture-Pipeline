@@ -86,7 +86,7 @@ jobs:
       working-directory: workspaces/starter/frontend
       env:
         IMAGE_TAG: latest
-        REPO_NAME: frontend
+        REPO_NAME: movie-fe
       run: |
         docker build --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 --tag 851725438281.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG .
         docker push 851725438281.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
@@ -101,7 +101,7 @@ jobs:
       working-directory: workspaces/starter/frontend/k8s
       env:
         IMAGE_TAG: latest
-        REPO_NAME: frontend
+        REPO_NAME: movie-fe
       run: |
           kustomize edit set image frontend=851725438281.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
           kustomize build | kubectl apply -f -
