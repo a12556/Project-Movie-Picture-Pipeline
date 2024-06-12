@@ -88,8 +88,8 @@ jobs:
         IMAGE_TAG: latest
         REPO_NAME: movie-fe
       run: |
-        docker build --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 --tag 851725438281.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG .
-        docker push 851725438281.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
+        docker build --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 --tag 851725438281.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:${GITHUB_SHA::7} .
+        docker push 851725438281.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:${GITHUB_SHA::7} 
     
 
     - name: Configure Kubeconfig
@@ -103,5 +103,5 @@ jobs:
         IMAGE_TAG: latest
         REPO_NAME: movie-fe
       run: |
-          kustomize edit set image frontend=851725438281.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
+          kustomize edit set image frontend=851725438281.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:${GITHUB_SHA::7}
           kustomize build | kubectl apply -f -
