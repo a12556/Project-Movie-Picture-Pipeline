@@ -47,7 +47,7 @@ jobs:
       run: npm ci
   
     - name: Test
-      run: cd workspaces/starter/frontend && CI=true npm test --passWithNoTests
+      run: cd workspaces/starter/frontend/src && CI=true npm test
       
   Build:
     needs: [Linting, Test]

@@ -48,7 +48,7 @@ jobs:
       run: npm ci
   
     - name: Test
-      run: cd workspaces/starter/frontend && npm test --passWithNoTests
+      run: cd workspaces/starter/frontend/src && npm test
 
 
 
