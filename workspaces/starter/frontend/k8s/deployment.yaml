@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: image-FE-name:latest
+          image: frontend
           ports:
             - containerPort: 3000
