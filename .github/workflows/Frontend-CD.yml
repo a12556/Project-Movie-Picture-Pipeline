@@ -27,7 +27,7 @@ jobs:
       run: npm ci
 
     - name: Checkout Run Lint
-      run: cd workspaces/starter/frontend && npm lint
+      run: cd workspaces/starter/frontend && FAIL_LINT=true npm lint
 
   Test:
     runs-on: ubuntu-latest
@@ -48,7 +48,7 @@ jobs:
       run: npm ci
   
     - name: Test
-      run: cd workspaces/starter/frontend/src && npm run test
+      run: cd workspaces/starter/frontend/src && unset MOVIE_HEADING npm run test
 
 
 
